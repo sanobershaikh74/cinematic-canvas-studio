@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ensureGsap } from "@/lib/gsap-setup";
 
 type Props = {
   children: ReactNode;
