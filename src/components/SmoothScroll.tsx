@@ -4,6 +4,8 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ensureGsap } from "@/lib/gsap-setup";
 
+ensureGsap();
+
 let registered = false;
 
 /**

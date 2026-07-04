@@ -3,6 +3,8 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ensureGsap } from "@/lib/gsap-setup";
 
+ensureGsap();
+
 type Props = {
   children: ReactNode;
   className?: string;

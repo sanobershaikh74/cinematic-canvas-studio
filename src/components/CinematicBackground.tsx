@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ensureGsap } from "@/lib/gsap-setup";
+
+ensureGsap();
 import videoAsset from "@/assets/aurora-cinematic.mp4.asset.json";
 import posterAsset from "@/assets/aurora-poster.jpg.asset.json";
 
