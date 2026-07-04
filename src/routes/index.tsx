@@ -1,24 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AuroraExperience } from "@/components/AuroraExperience";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Aurora — Cinematic Herbal Beauty" },
+      {
+        name: "description",
+        content:
+          "Aurora is a slow-crafted herbal skincare ritual — wild botanicals, cold-pressed oils, and cinematic craft, distilled under golden hour.",
+      },
+      { property: "og:title", content: "Aurora — Cinematic Herbal Beauty" },
+      {
+        property: "og:description",
+        content:
+          "A cinematic journey through wild botanicals, hand-crafted herbal skincare and the Aurora ritual.",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+  return <AuroraExperience />;
 }
