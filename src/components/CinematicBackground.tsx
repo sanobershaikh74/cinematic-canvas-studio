@@ -1,82 +1,172 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ensureGsap } from "@/lib/gsap-setup";
 
 ensureGsap();
-import videoAsset from "@/assets/aurora-cinematic.mp4.asset.json";
-import posterAsset from "@/assets/aurora-poster.jpg.asset.json";
+
+const TOTAL_FRAMES = 156;
+const framePath = (i: number) =>
+  `/frames/f_${String(i).padStart(3, "0")}.webp`;
 
 /**
- * Fixed fullscreen cinematic environment.
- * The single visual world behind every section — scroll-synchronized playback,
- * subtle scale/parallax breathing, and atmospheric overlays.
+ * Scroll-driven cinematic frame sequence.
+ * Each frame is pre-loaded into an off-screen Image cache, then painted onto
+ * a single fullscreen <canvas>. The current frame index is derived from
+ * scroll progress (Lenis-synced via GSAP ScrollTrigger), so the video only
+ * advances as the user scrolls — never on a loop.
  */
 export function CinematicBackground() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const currentFrameRef = useRef(0);
+  const stateRef = useRef({ progress: 0 });
+  const [loaded, setLoaded] = useState(0);
 
+  // Preload all frames into an in-memory cache. We paint from these
+  // images synchronously as scroll advances.
   useEffect(() => {
-    const video = videoRef.current;
-    const wrap = wrapRef.current;
-    if (!video || !wrap) return;
+    let cancelled = false;
+    let done = 0;
+    const arr: HTMLImageElement[] = new Array(TOTAL_FRAMES);
+    for (let i = 0; i < TOTAL_FRAMES; i++) {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = framePath(i + 1);
+      img.onload = () => {
+        if (cancelled) return;
+        done += 1;
+        setLoaded(done);
+        // Paint the very first frame as soon as it's ready so the
+        // background isn't blank while the rest download.
+        if (i === 0) requestAnimationFrame(paint);
+      };
+      arr[i] = img;
+    }
+    imagesRef.current = arr;
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    // Try to autoplay muted looped for continuous ambient motion,
-    // then bind scroll progress to a subtle parallax + zoom.
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
-    const playPromise = video.play();
-    if (playPromise) playPromise.catch(() => {/* ignore autoplay block */});
+  // Paint the current frame to the canvas, sized to the viewport with
+  // object-fit: cover semantics.
+  const paint = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const idx = Math.min(
+      TOTAL_FRAMES - 1,
+      Math.max(0, Math.round(stateRef.current.progress * (TOTAL_FRAMES - 1))),
+    );
+    currentFrameRef.current = idx;
+    const img = imagesRef.current[idx];
+    if (!img || !img.complete || img.naturalWidth === 0) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    if (canvas.width !== vw * dpr || canvas.height !== vh * dpr) {
+      canvas.width = vw * dpr;
+      canvas.height = vh * dpr;
+      canvas.style.width = `${vw}px`;
+      canvas.style.height = `${vh}px`;
+    }
+
+    // Cover fit
+    const iw = img.naturalWidth;
+    const ih = img.naturalHeight;
+    const canvasRatio = (vw * dpr) / (vh * dpr);
+    const imgRatio = iw / ih;
+    let sx = 0,
+      sy = 0,
+      sw = iw,
+      sh = ih;
+    if (imgRatio > canvasRatio) {
+      // image wider than canvas: crop sides
+      sw = ih * canvasRatio;
+      sx = (iw - sw) / 2;
+    } else {
+      sh = iw / canvasRatio;
+      sy = (ih - sh) / 2;
+    }
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+  };
+
+  // Bind scroll progress → frame index via GSAP ScrollTrigger (synced with Lenis).
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
 
     const ctx = gsap.context(() => {
-      // Subtle cinematic push-in tied to global scroll progress.
-      gsap.fromTo(
-        video,
-        { scale: 1.05, yPercent: 0, filter: "brightness(1) saturate(1.05)" },
-        {
-          scale: 1.18,
-          yPercent: -4,
-          filter: "brightness(0.85) saturate(1.15)",
-          ease: "none",
-          scrollTrigger: {
-            trigger: document.documentElement,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 1.2,
+      gsap.to(stateRef.current, {
+        progress: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: document.documentElement,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 0.35, // small easing so frames advance smoothly with Lenis
+          onUpdate: () => {
+            // Only repaint if the target frame actually changed.
+            const target = Math.round(
+              stateRef.current.progress * (TOTAL_FRAMES - 1),
+            );
+            if (target !== currentFrameRef.current) paint();
           },
         },
-      );
-    }, wrap);
+      });
+    });
 
-    return () => ctx.revert();
+    const onResize = () => paint();
+    window.addEventListener("resize", onResize);
+    // Initial paint attempt
+    paint();
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      ctx.revert();
+    };
   }, []);
 
   return (
     <>
-      <div ref={wrapRef} className="aurora-bg" aria-hidden="true">
-        <video
-          ref={videoRef}
-          poster={posterAsset.url}
-          preload="auto"
-          autoPlay
-          muted
-          loop
-          playsInline
-          disablePictureInPicture
-        >
-          <source src={videoAsset.url} type="video/mp4" />
-        </video>
+      <div className="aurora-bg" aria-hidden="true">
+        <canvas ref={canvasRef} className="h-full w-full" />
       </div>
       <div className="aurora-vignette" aria-hidden="true" />
       <div className="aurora-grain" aria-hidden="true" />
       <FloatingParticles />
+      <LoadingReadout loaded={loaded} total={TOTAL_FRAMES} />
     </>
   );
 }
 
+function LoadingReadout({ loaded, total }: { loaded: number; total: number }) {
+  // Subtle indicator during the initial cache — dissolves once ready.
+  const ready = loaded >= total;
+  return (
+    <div
+      className={`pointer-events-none fixed bottom-6 right-6 z-40 flex items-center gap-3 rounded-full border border-ivory/20 bg-forest-deep/40 px-4 py-2 text-[0.6rem] uppercase tracking-[0.32em] text-ivory/80 backdrop-blur-md transition-opacity duration-700 ${
+        ready ? "opacity-0" : "opacity-100"
+      }`}
+      aria-hidden="true"
+    >
+      <span className="relative block h-1 w-24 overflow-hidden rounded-full bg-ivory/15">
+        <span
+          className="absolute inset-y-0 left-0 bg-gold"
+          style={{ width: `${(loaded / total) * 100}%` }}
+        />
+      </span>
+      <span>Preparing scene · {Math.round((loaded / total) * 100)}%</span>
+    </div>
+  );
+}
+
 function FloatingParticles() {
-  // Deterministic botanical motes drifting upward — enhances immersion.
   const particles = Array.from({ length: 14 }, (_, i) => i);
   return (
     <div
@@ -99,7 +189,8 @@ function FloatingParticles() {
               height: size,
               animation: `drift ${duration}s linear ${delay}s infinite`,
               filter: "blur(1px)",
-              boxShadow: "0 0 8px color-mix(in oklab, var(--gold) 60%, transparent)",
+              boxShadow:
+                "0 0 8px color-mix(in oklab, var(--gold) 60%, transparent)",
             }}
           />
         );
