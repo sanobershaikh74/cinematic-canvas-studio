@@ -3,11 +3,12 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ensureGsap } from "@/lib/gsap-setup";
 
+import { auroraConfig } from "@/config/aurora.config";
+
 ensureGsap();
 
-const TOTAL_FRAMES = 156;
-const framePath = (i: number) =>
-  `/frames/f_${String(i).padStart(3, "0")}.webp`;
+const TOTAL_FRAMES = auroraConfig.frames.total;
+const framePath = auroraConfig.frames.path;
 
 /**
  * Scroll-driven cinematic frame sequence.
