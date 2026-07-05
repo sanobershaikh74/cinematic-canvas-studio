@@ -38,6 +38,7 @@ export function AuroraExperience() {
       <CinematicBackground />
 
       <Navigation />
+      <AnimatedTextController />
 
       <main className="relative z-10">
         <Hero />
