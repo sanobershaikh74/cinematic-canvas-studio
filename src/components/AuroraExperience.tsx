@@ -3,6 +3,7 @@ import { CinematicBackground } from "@/components/CinematicBackground";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/sections/Hero";
+import { AnimatedTextController } from "@/components/AnimatedText";
 import {
   Story,
   Philosophy,
