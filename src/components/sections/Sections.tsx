@@ -12,7 +12,7 @@ export function Story() {
       <div className="mx-auto grid max-w-6xl gap-16 md:grid-cols-12 md:items-end">
         <Reveal className="md:col-span-5">
           <p className="mb-6 text-xs uppercase tracking-[0.4em] text-gold">Chapter I</p>
-          <h2 className="font-display text-5xl leading-[1.02] text-balance md:text-6xl">
+          <h2 data-animate="text" className="font-display text-5xl leading-[1.02] text-balance md:text-6xl">
             A quiet return to the <em className="text-gold">wild garden.</em>
           </h2>
         </Reveal>
@@ -65,7 +65,7 @@ export function Philosophy() {
       <div className="mx-auto max-w-6xl">
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="mb-6 text-xs uppercase tracking-[0.4em] text-gold">Chapter II · Philosophy</p>
-          <h2 className="font-display text-5xl text-ivory text-balance md:text-6xl">
+          <h2 data-animate="text" className="font-display text-5xl text-ivory text-balance md:text-6xl">
             Four principles, one ritual.
           </h2>
         </Reveal>
@@ -135,7 +135,7 @@ export function Ingredients() {
             <p className="mb-6 text-xs uppercase tracking-[0.4em] text-gold">
               Chapter III · Ingredients
             </p>
-            <h2 className="font-display text-5xl leading-[1.02] text-balance md:text-6xl">
+            <h2 data-animate="text" className="font-display text-5xl leading-[1.02] text-balance md:text-6xl">
               A herbarium, <em className="text-gold">alive.</em>
             </h2>
           </div>
@@ -211,7 +211,7 @@ export function Products() {
           <p className="mb-6 text-xs uppercase tracking-[0.4em] text-gold">
             Chapter IV · Collection
           </p>
-          <h2 className="font-display text-5xl text-balance md:text-6xl">
+          <h2 data-animate="text" className="font-display text-5xl text-balance md:text-6xl">
             The Aurora <em className="text-gold">collection.</em>
           </h2>
           <p className="mt-6 text-ivory/75">
@@ -351,7 +351,7 @@ export function Testimonials() {
       <div className="mx-auto max-w-6xl">
         <Reveal className="text-center">
           <p className="mb-6 text-xs uppercase tracking-[0.4em] text-gold">Voices</p>
-          <h2 className="font-display text-5xl text-balance md:text-6xl">
+          <h2 data-animate="text" className="font-display text-5xl text-balance md:text-6xl">
             Read like <em className="text-gold">letters</em>, worn like light.
           </h2>
         </Reveal>
@@ -407,7 +407,7 @@ export function Routine() {
           <p className="mb-6 text-xs uppercase tracking-[0.4em] text-gold">
             Chapter V · Ritual
           </p>
-          <h2 className="font-display text-5xl text-balance md:text-6xl">
+          <h2 data-animate="text" className="font-display text-5xl text-balance md:text-6xl">
             A three-step <em className="text-gold">beauty ritual.</em>
           </h2>
         </Reveal>
@@ -461,7 +461,7 @@ export function FaqAndJournal() {
           <p className="mb-6 text-xs uppercase tracking-[0.4em] text-gold">
             Journal · Questions
           </p>
-          <h2 className="font-display text-5xl leading-[1.05] text-balance md:text-6xl">
+          <h2 data-animate="text" className="font-display text-5xl leading-[1.05] text-balance md:text-6xl">
             Quiet answers, honestly kept.
           </h2>
           <p className="mt-6 text-ivory/75">
@@ -503,7 +503,7 @@ export function Newsletter() {
           <p className="mb-4 text-xs uppercase tracking-[0.4em] text-gold">
             The Ritual Letter
           </p>
-          <h2 className="font-display text-4xl text-forest-deep text-balance md:text-5xl">
+          <h2 data-animate="text" className="font-display text-4xl text-forest-deep text-balance md:text-5xl">
             A slow letter, once a season.
           </h2>
           <p className="mx-auto mt-6 max-w-lg text-forest-deep/70">

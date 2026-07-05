@@ -3,6 +3,7 @@ import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ensureGsap } from "@/lib/gsap-setup";
+import { auroraConfig } from "@/config/aurora.config";
 
 ensureGsap();
 
@@ -24,11 +25,11 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: auroraConfig.scroll.duration,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: !reduced,
-      wheelMultiplier: 1,
-      touchMultiplier: 1.2,
+      wheelMultiplier: auroraConfig.scroll.wheelMultiplier,
+      touchMultiplier: auroraConfig.scroll.touchMultiplier,
     });
 
     lenis.on("scroll", ScrollTrigger.update);
